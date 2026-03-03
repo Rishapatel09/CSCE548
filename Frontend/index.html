@@ -1,0 +1,197 @@
+\<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Calorie Tracker • API Client</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div class="bg">
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="orb orb3"></div>
+  </div>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">CT</div>
+      <div>
+        <div class="title">Calorie Tracker</div>
+        <div class="subtitle">API Client Dashboard</div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button id="themeToggle" class="btn ghost" title="Toggle theme">🌗 Theme</button>
+      <button id="fetchAll" class="btn primary">Fetch All</button>
+      <button id="clearAll" class="btn ghost">Clear</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Settings -->
+    <section class="card settings">
+      <div class="card-head">
+        <h2>API Settings</h2>
+        <span class="pill">Base URL + Health Check</span>
+      </div>
+
+      <div class="grid2">
+        <div class="field">
+          <label for="baseUrl">Base URL</label>
+          <div class="input-row">
+            <input id="baseUrl" value="http://localhost:8080" />
+            <button id="saveBaseUrl" class="btn">Save</button>
+          </div>
+        </div>
+
+      <div class="statusbar">
+        <div class="dot" id="dot"></div>
+        <div id="status">Ready.</div>
+      </div>
+    </section>
+
+    <!-- Tabs -->
+    <section class="card">
+      <div class="tabs">
+        <button class="tab active" data-tab="users">Users</button>
+        <button class="tab" data-tab="entries">Entries</button>
+        <button class="tab" data-tab="foods">Food Items</button>
+      </div>
+
+      <!-- USERS -->
+      <section class="panel active" id="panel-users">
+        <div class="panel-head">
+          <div>
+            <h3>Users <span class="muted">(app_user)</span></h3>
+            <p class="muted small">GET all • GET single</p>
+          </div>
+          <div class="chip">/users</div>
+        </div>
+
+        <div class="controls">
+          <button id="usersAll" class="btn primary">GET /users (all)</button>
+
+          <div class="inline">
+            <input id="userId" type="number" placeholder="user_id" />
+            <button id="usersOne" class="btn">GET /users/{id}</button>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="table" id="usersTable">
+            <thead>
+              <tr>
+                <th>User ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Created</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <pre id="usersRaw" class="raw"></pre>
+        </div>
+      </section>
+
+      <!-- ENTRIES -->
+      <section class="panel" id="panel-entries">
+        <div class="panel-head">
+          <div>
+            <h3>Entries <span class="muted">(calorie_entry)</span></h3>
+            <p class="muted small">GET all • GET single • GET subset by user</p>
+          </div>
+          <div class="chip">/entries • /users/{userId}/entries</div>
+        </div>
+
+        <div class="controls">
+          <button id="entriesAll" class="btn primary">GET /entries (all)</button>
+
+          <div class="inline">
+            <input id="entryId" type="number" placeholder="entry_id" />
+            <button id="entriesOne" class="btn">GET /entries/{id}</button>
+          </div>
+
+          <div class="inline">
+            <input id="entryUserId" type="number" placeholder="user_id for subset" />
+            <button id="entriesSubset" class="btn">GET /users/{userId}/entries</button>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="table" id="entriesTable">
+            <thead>
+              <tr>
+                <th>Entry ID</th>
+                <th>User ID</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Meal</th>
+                <th>Calories</th>
+                <th>P</th>
+                <th>C</th>
+                <th>F</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <pre id="entriesRaw" class="raw"></pre>
+        </div>
+      </section>
+
+      <!-- FOODS -->
+      <section class="panel" id="panel-foods">
+        <div class="panel-head">
+          <div>
+            <h3>Food Items <span class="muted">(food_item)</span></h3>
+            <p class="muted small">GET all • GET single • GET subset by entry</p>
+          </div>
+          <div class="chip">/food-items • /food-items/entry/{entryId}</div>
+        </div>
+
+        <div class="controls">
+          <button id="foodsAll" class="btn primary">GET /food-items (all)</button>
+
+          <div class="inline">
+            <input id="foodId" type="number" placeholder="food_id" />
+            <button id="foodsOne" class="btn">GET /food-items/{id}</button>
+          </div>
+
+          <div class="inline">
+            <input id="foodEntryId" type="number" placeholder="entry_id for subset" />
+            <button id="foodsSubset" class="btn">GET /food-items/entry/{entryId}</button>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="table" id="foodsTable">
+            <thead>
+              <tr>
+                <th>Food ID</th>
+                <th>Entry ID</th>
+                <th>Name</th>
+                <th>Serving</th>
+                <th>Cal/Srv</th>
+                <th>P</th>
+                <th>C</th>
+                <th>F</th>
+                <th>Servings</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <pre id="foodsRaw" class="raw"></pre>
+        </div>
+      </section>
+    </section>
+
+    
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

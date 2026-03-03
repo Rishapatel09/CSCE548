@@ -1,0 +1,240 @@
+:root{
+  --bg:#0b1020;
+  --card:#0f1733cc;
+  --card2:#0d142dcc;
+  --text:#eaf0ff;
+  --muted:#a9b4d0;
+  --line:#253055;
+  --accent:#7c5cff;
+  --accent2:#2ee6a6;
+  --danger:#ff5470;
+  --shadow: 0 20px 60px rgba(0,0,0,.35);
+  --radius: 18px;
+}
+
+*{ box-sizing:border-box; }
+html,body{ height:100%; }
+body{
+  margin:0;
+  color:var(--text);
+  background: radial-gradient(1200px 600px at 10% 10%, #1b2b7a33, transparent 60%),
+              radial-gradient(1000px 500px at 90% 20%, #7c5cff22, transparent 50%),
+              radial-gradient(900px 500px at 40% 100%, #2ee6a620, transparent 55%),
+              var(--bg);
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+.bg{ position:fixed; inset:0; pointer-events:none; overflow:hidden; }
+.orb{
+  position:absolute; border-radius:999px; filter: blur(30px);
+  opacity:.35;
+}
+.orb1{ width:420px;height:420px; left:-120px; top:-120px; background:var(--accent); }
+.orb2{ width:520px;height:520px; right:-180px; top:40px; background:var(--accent2); }
+.orb3{ width:500px;height:500px; left:30%; bottom:-220px; background:#ffcc6622; }
+
+.topbar{
+  position:sticky; top:0;
+  backdrop-filter: blur(14px);
+  background: linear-gradient(to bottom, #0b1020cc, #0b102055);
+  border-bottom: 1px solid #1f2a45;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 18px;
+  z-index:10;
+}
+
+.brand{ display:flex; gap:12px; align-items:center; }
+.logo{
+  width:44px;height:44px; border-radius:14px;
+  display:grid; place-items:center;
+  background: linear-gradient(135deg, var(--accent), #4f46e5);
+  box-shadow: var(--shadow);
+  font-weight:800;
+}
+.title{ font-size:16px; font-weight:800; letter-spacing:.2px;}
+.subtitle{ font-size:12px; color:var(--muted); margin-top:2px;}
+
+.actions{ display:flex; gap:10px; align-items:center; }
+
+.container{ max-width: 1180px; margin: 18px auto; padding: 0 16px 40px; }
+
+.card{
+  background: linear-gradient(180deg, var(--card), var(--card2));
+  border: 1px solid #1f2a45;
+  border-radius: var(--radius);
+  padding: 14px;
+  box-shadow: var(--shadow);
+}
+
+.settings{ margin-bottom: 14px; }
+
+.card-head{
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:10px;
+}
+.card-head h2{ margin:0; font-size:14px; letter-spacing:.3px; }
+
+.pill{
+  font-size:12px; color: #dfe6ff;
+  padding: 6px 10px;
+  border: 1px solid #2b3a66;
+  border-radius: 999px;
+  background:#101a38aa;
+}
+
+.grid2{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 900px){ .grid2{ grid-template-columns:1fr; } }
+
+.field label{ display:block; font-size:12px; color:var(--muted); margin-bottom:6px; }
+.hint{ margin-top:6px; font-size:12px; color:var(--muted); }
+.hint code{ background:#0b1433; border:1px solid #22305a; padding:1px 6px; border-radius:8px; color:#dbe6ff; }
+
+.input-row{ display:flex; gap:10px; align-items:center; }
+input{
+  width:100%;
+  padding:10px 12px;
+  border-radius: 14px;
+  border: 1px solid #2b3a66;
+  background:#0b1433;
+  color:var(--text);
+  outline:none;
+}
+input:focus{ border-color:#6c66ff; box-shadow:0 0 0 3px #7c5cff22; }
+
+.btn{
+  border: 1px solid #2b3a66;
+  background:#101a38;
+  color:var(--text);
+  padding:10px 12px;
+  border-radius: 14px;
+  cursor:pointer;
+  transition: transform .06s ease, filter .2s ease;
+  font-weight: 650;
+}
+.btn:hover{ filter: brightness(1.08); }
+.btn:active{ transform: translateY(1px); }
+.btn.primary{
+  background: linear-gradient(135deg, var(--accent), #4f46e5);
+  border-color: transparent;
+}
+.btn.ghost{
+  background: transparent;
+}
+
+.statusbar{
+  margin-top: 12px;
+  display:flex; align-items:center; gap:10px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid #2b3a66;
+  background:#0b1433;
+}
+.dot{
+  width:10px; height:10px; border-radius:999px;
+  background:#6b7280;
+  box-shadow:0 0 0 6px #6b728011;
+}
+.dot.ok{ background: var(--accent2); box-shadow:0 0 0 6px #2ee6a618; }
+.dot.err{ background: var(--danger); box-shadow:0 0 0 6px #ff54701a; }
+
+.tabs{ display:flex; gap:10px; margin-bottom: 12px; }
+.tab{
+  border-radius: 999px;
+  border:1px solid #2b3a66;
+  background:#0b1433;
+  color:var(--text);
+  padding: 8px 12px;
+  cursor:pointer;
+}
+.tab.active{
+  background: linear-gradient(135deg, #2ee6a633, #7c5cff33);
+  border-color:#4960aa;
+}
+
+.panel{ display:none; }
+.panel.active{ display:block; }
+
+.panel-head{
+  display:flex; justify-content:space-between; align-items:flex-start;
+  gap:12px;
+  margin-bottom: 10px;
+}
+.panel-head h3{ margin:0; font-size:15px; }
+.muted{ color:var(--muted); }
+.small{ font-size:12px; }
+
+.chip{
+  font-size:12px;
+  padding: 6px 10px;
+  border-radius: 12px;
+  border:1px solid #2b3a66;
+  background:#0b1433;
+  color:#dbe6ff;
+  white-space: nowrap;
+}
+
+.controls{
+  display:flex; flex-wrap:wrap; gap:10px;
+  margin-bottom: 12px;
+}
+.inline{ display:flex; gap:10px; align-items:center; flex:1 1 320px; }
+
+.table-wrap{
+  display:grid;
+  grid-template-columns: 1fr;
+  gap:10px;
+}
+
+.table{
+  width:100%;
+  border-collapse: collapse;
+  overflow:hidden;
+  border-radius: 14px;
+  border: 1px solid #22305a;
+  background:#0b1433;
+}
+.table thead th{
+  text-align:left;
+  font-size:12px;
+  color:#cfe0ff;
+  padding:10px 10px;
+  border-bottom: 1px solid #22305a;
+}
+.table tbody td{
+  padding:9px 10px;
+  font-size:13px;
+  border-bottom: 1px solid #18234a;
+  color:#eaf0ff;
+}
+.table tbody tr:hover{ background:#0f1a3a; }
+
+.raw{
+  margin:0;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px dashed #2b3a66;
+  background: #0b1433;
+  color: #dbe6ff;
+  max-height: 280px;
+  overflow:auto;
+  font-size:12px;
+}
+
+.footer{ margin-top: 14px; text-align:center; }
+
+/* Light theme */
+body.light{
+  --bg:#f4f7ff;
+  --card:#ffffffcc;
+  --card2:#ffffffcc;
+  --text:#0b1020;
+  --muted:#4b5563;
+  --line:#d6def5;
+  --shadow: 0 10px 30px rgba(0,0,0,.08);
+}
+body.light input,
+body.light .statusbar,
+body.light .table,
+body.light .raw,
+body.light .chip,
+body.light .tab{ background:#ffffff; }

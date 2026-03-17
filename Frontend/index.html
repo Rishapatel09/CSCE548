@@ -1,197 +1,1149 @@
-\<!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Calorie Tracker • API Client</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>Calorie Tracker</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f7f5f2;
+      --surface: #ffffff;
+      --border: #e5e0d8;
+      --accent: #2d6a4f;
+      --accent-light: #e8f4ee;
+      --danger: #c0392b;
+      --danger-light: #fdf0ee;
+      --text: #1a1a1a;
+      --muted: #6b6b6b;
+      --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04);
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      width: 36px; height: 36px;
+      background: var(--accent);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      color: white;
+      font-family: 'DM Serif Display', serif;
+      font-size: 16px;
+    }
+
+    .brand-name {
+      font-family: 'DM Serif Display', serif;
+      font-size: 20px;
+      color: var(--text);
+    }
+
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #ccc;
+      transition: background 0.3s;
+    }
+    .dot.ok { background: #27ae60; }
+    .dot.err { background: var(--danger); }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      min-height: calc(100vh - 64px);
+    }
+
+    nav {
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 1.5rem 0;
+      position: sticky;
+      top: 64px;
+      height: calc(100vh - 64px);
+      overflow-y: auto;
+    }
+
+    .nav-section {
+      padding: 0 1rem 1rem;
+    }
+
+    .nav-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 0 0.5rem 0.5rem;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--muted);
+      transition: all 0.15s;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+    }
+
+    .nav-item:hover { background: var(--bg); color: var(--text); }
+    .nav-item.active { background: var(--accent-light); color: var(--accent); font-weight: 600; }
+
+    .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+
+    .main {
+      padding: 2rem;
+      max-width: 900px;
+    }
+
+    .page { display: none; }
+    .page.active { display: block; }
+
+    .page-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 28px;
+      margin-bottom: 4px;
+    }
+
+    .page-subtitle {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 1.5rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title .badge {
+      font-size: 11px;
+      font-weight: 500;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--accent-light);
+      color: var(--accent);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .form-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+    .form-grid.cols-1 { grid-template-columns: 1fr; }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .field.span2 { grid-column: span 2; }
+    .field.span3 { grid-column: span 3; }
+
+    label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    input, select, textarea {
+      padding: 9px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      color: var(--text);
+      background: var(--bg);
+      transition: border-color 0.15s;
+      width: 100%;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: white;
+    }
+
+    textarea { resize: vertical; min-height: 72px; }
+
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 9px 18px;
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1.5px solid transparent;
+      transition: all 0.15s;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+    .btn-primary:hover { background: #235c42; }
+
+    .btn-secondary {
+      background: white;
+      color: var(--text);
+      border-color: var(--border);
+    }
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+    .btn-danger {
+      background: var(--danger-light);
+      color: var(--danger);
+      border-color: #f5c6c2;
+    }
+    .btn-danger:hover { background: var(--danger); color: white; }
+
+    .btn-sm {
+      padding: 5px 12px;
+      font-size: 12px;
+    }
+
+    .result-box {
+      margin-top: 1rem;
+      padding: 12px 16px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      color: var(--text);
+      min-height: 40px;
+      white-space: pre-wrap;
+      font-family: 'DM Sans', sans-serif;
+      display: none;
+    }
+
+    .result-box.visible { display: block; }
+    .result-box.success { border-color: #a8d5b8; background: #f0faf4; color: #1d5c35; }
+    .result-box.error { border-color: #f5c6c2; background: var(--danger-light); color: var(--danger); }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th {
+      text-align: left;
+      padding: 8px 12px;
+      background: var(--bg);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--bg); }
+
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      margin-top: 1rem;
+    }
+
+    .empty-msg {
+      text-align: center;
+      padding: 2rem;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 1.5rem 0;
+    }
+
+    .url-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+    }
+
+    .url-bar input {
+      flex: 1;
+      border: none;
+      background: none;
+      padding: 0;
+      font-size: 13px;
+    }
+
+    .url-bar input:focus { outline: none; }
+
+    @media (max-width: 700px) {
+      .layout { grid-template-columns: 1fr; }
+      nav { display: none; }
+      .form-grid { grid-template-columns: 1fr; }
+      .form-grid.cols-3 { grid-template-columns: 1fr; }
+      .field.span2, .field.span3 { grid-column: span 1; }
+    }
+  </style>
 </head>
-
 <body>
-  <div class="bg">
-    <div class="orb orb1"></div>
-    <div class="orb orb2"></div>
-    <div class="orb orb3"></div>
+
+<header>
+  <div class="brand">
+    <div class="logo">CT</div>
+    <span class="brand-name">Calorie Tracker</span>
   </div>
+  <div class="status-bar">
+    <div class="dot" id="dot"></div>
+    <span id="statusText">Ready</span>
+  </div>
+</header>
 
-  <header class="topbar">
-    <div class="brand">
-      <div class="logo">CT</div>
-      <div>
-        <div class="title">Calorie Tracker</div>
-        <div class="subtitle">API Client Dashboard</div>
+<div class="layout">
+  <nav>
+    <div class="nav-section">
+      <div class="nav-label">Manage</div>
+      <button class="nav-item active" onclick="showPage('users', this)">
+        <span class="nav-icon">👤</span> Users
+      </button>
+      <button class="nav-item" onclick="showPage('entries', this)">
+        <span class="nav-icon">📋</span> Calorie Entries
+      </button>
+      <button class="nav-item" onclick="showPage('foods', this)">
+        <span class="nav-icon">🥗</span> Food Items
+      </button>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Settings</div>
+      <button class="nav-item" onclick="showPage('settings', this)">
+        <span class="nav-icon">⚙️</span> API Settings
+      </button>
+    </div>
+  </nav>
+
+  <div class="main">
+
+    <!-- USERS PAGE -->
+    <div class="page active" id="page-users">
+      <div class="page-title">Users</div>
+      <div class="page-subtitle">Manage the people using this app</div>
+
+      <!-- View All Users -->
+      <div class="card">
+        <div class="card-title">All Users</div>
+        <div class="btn-row">
+          <button class="btn-primary" onclick="loadAllUsers()">Show All Users</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Created</th></tr></thead>
+            <tbody id="usersTableBody"><tr><td colspan="4" class="empty-msg">Click "Show All Users" to view records</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Get Single User -->
+      <div class="card">
+        <div class="card-title">Find a User</div>
+        <div class="form-grid">
+          <div class="field">
+            <label>Which user?</label>
+            <input type="number" id="getUserId" placeholder="e.g. 1" />
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn-secondary" onclick="getUserById()">Find User</button>
+        </div>
+        <div class="result-box" id="getUserResult"></div>
+      </div>
+
+      <!-- Create User -->
+      <div class="card">
+        <div class="card-title">Add New User</div>
+        <div class="form-grid">
+          <div class="field">
+            <label>Full Name</label>
+            <input type="text" id="createUserName" placeholder="e.g. Jane Smith" />
+          </div>
+          <div class="field">
+            <label>Email Address</label>
+            <input type="email" id="createUserEmail" placeholder="e.g. jane@example.com" />
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn-primary" onclick="createUser()">Create User</button>
+        </div>
+        <div class="result-box" id="createUserResult"></div>
+      </div>
+
+      <!-- Update User -->
+      <div class="card">
+        <div class="card-title">Edit User</div>
+        <div class="form-grid cols-3">
+          <div class="field">
+            <label>User ID</label>
+            <input type="number" id="updateUserId" placeholder="e.g. 1" />
+          </div>
+          <div class="field">
+            <label>New Name</label>
+            <input type="text" id="updateUserName" placeholder="New name" />
+          </div>
+          <div class="field">
+            <label>New Email</label>
+            <input type="email" id="updateUserEmail" placeholder="New email" />
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn-secondary" onclick="updateUser()">Update User</button>
+        </div>
+        <div class="result-box" id="updateUserResult"></div>
+      </div>
+
+      <!-- Delete User -->
+      <div class="card">
+        <div class="card-title">Remove User</div>
+        <div class="form-grid">
+          <div class="field">
+            <label>User ID</label>
+            <input type="number" id="deleteUserId" placeholder="e.g. 1" />
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn-danger" onclick="deleteUser()">Delete User</button>
+        </div>
+        <div class="result-box" id="deleteUserResult"></div>
       </div>
     </div>
 
-    <div class="actions">
-      <button id="themeToggle" class="btn ghost" title="Toggle theme">🌗 Theme</button>
-      <button id="fetchAll" class="btn primary">Fetch All</button>
-      <button id="clearAll" class="btn ghost">Clear</button>
+    <!-- ENTRIES PAGE -->
+    <div class="page" id="page-entries">
+      <div class="page-title">Calorie Entries</div>
+      <div class="page-subtitle">Track what you eat each day</div>
+
+      <!-- View All Entries -->
+      <div class="card">
+        <div class="card-title">📋 All Entries</div>
+        <div class="btn-row">
+          <button class="btn-primary" onclick="loadAllEntries()">Show All Entries</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ID</th><th>User</th><th>Date</th><th>Time</th><th>Meal</th><th>Cal</th><th>P</th><th>C</th><th>F</th></tr></thead>
+            <tbody id="entriesTableBody"><tr><td colspan="9" class="empty-msg">Click "Show All Entries" to view records</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Get by User -->
+      <div class="card">
+        <div class="card-title">Entries for a User</div>
+        <div class="form-grid">
+          <div class="field">
+            <label>Which user?</label>
+            <input type="number" id="getEntriesUserId" placeholder="e.g. 1" />
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn-secondary" onclick="getEntriesByUser()">Find Entries</button>
+        </div>
+        <div class="result-box" id="getEntriesByUserResult"></div>
+      </div>
+
+      <!-- Create Entry -->
+      <div class="card">
+        <div class="card-title">Log a Meal</div>
+        <div class="form-grid cols-3">
+          <div class="field">
+            <label>Which user?</label>
+            <input type="number" id="createEntryUserId" placeholder="e.g. 1" />
+          </div>
+          <div class="field">
+            <label>Date</label>
+            <input type="date" id="createEntryDate" />
+          </div>
+          <div class="field">
+            <label>Time</label>
+            <input type="time" id="createEntryTime" />
+          </div>
+          <div class="field">
+            <label>Meal Type</label>
+            <select id="createEntryMeal">
+              <option value="">Select meal...</option>
+              <option>Breakfast</option>
+              <option>Lunch</option>
+              <option>Dinner</option>
+              <option>Snack</option>
+              <option>Brunch</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Total Calories</label>
+            <input type="number" step="0.1" id="createEntryCalories" placeholder="e.g. 450" />
+          </div>
+          <div class="field">
+            <label>Protein (g)</label>
+            <input type="number" step="0.1" id="createEntryProtein" placeholder="e.g. 30" />
+          </div>
+          <div class="field">
+            <label>Carbs (g)</label>
+            <input type="number" step="0.1" id="createEntryCarbs" placeholder="e.g. 45" />
+          </div>
+          <div class="field">
+            <label>Fats (g)</label>
+            <input type="number" step="0.1" id="createEntryFats" placeholder="e.g. 15" />
+          </div>
+          <div class="field">
+            <label>Notes (optional)</label>
+            <input type="text" id="createEntryNotes" placeholder="Any notes..." />
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn-primary" onclick="createEntry()">Log Entry</button>
+        </div>
+        <div class="result-box" id="createEntryResult"></div>
+      </div>
+
+      <!-- Update Entry -->
+      <div class="card">
+        <div class="card-title">Edit an Entry</div>
+        <div class="form-grid cols-3">
+          <div class="field">
+            <label>Entry ID</label>
+            <input type="number" id="updateEntryId" placeholder="e.g. 1" />
+          </div>
+          <div class="field">
+            <label>Which user?</label>
+            <input type="number" id="updateEntryUserId" placeholder="e.g. 1" />
+          </div>
+          <div class="field">
+            <label>Date</label>
+            <input type="date" id="updateEntryDate" />
+          </div>
+          <div class="field">
+            <label>Time</label>
+            <input type="time" id="updateEntryTime" />
+          </div>
+          <div class="field">
+            <label>Meal Type</label>
+            <select id="updateEntryMeal">
+              <option value="">Select meal...</option>
+              <option>Breakfast</option>
+              <option>Lunch</option>
+              <option>Dinner</option>
+              <option>Snack</option>
+              <option>Brunch</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Calories</label>
+            <input type="number" step="0.1" id="updateEntryCalories" placeholder="e.g. 500" />
+          </div>
+          <div class="field">
+            <label>Protein (g)</label>
+            <input type="number" step="0.1" id="updateEntryProtein" placeholder="e.g. 35" />
+          </div>
+          <div class="field">
+            <label>Carbs (g)</label>
+            <input type="number" step="0.1" id="updateEntryCarbs" placeholder="e.g. 50" />
+          </div>
+          <div class="field">
+            <label>Fats (g)</label>
+            <input type="number" step="0.1" id="updateEntryFats" placeholder="e.g. 18" />
+          </div>
+          <div class="field">
+            <label>Notes</label>
+            <input type="text" id="updateEntryNotes" placeholder="Updated notes..." />
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn-secondary" onclick="updateEntry()">Update Entry</button>
+        </div>
+        <div class="result-box" id="updateEntryResult"></div>
+      </div>
+
+      <!-- Delete Entry -->
+      <div class="card">
+        <div class="card-title">Remove an Entry</div>
+        <div class="form-grid">
+          <div class="field">
+            <label>Entry ID</label>
+            <input type="number" id="deleteEntryId" placeholder="e.g. 1" />
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn-danger" onclick="deleteEntry()">Delete Entry</button>
+        </div>
+        <div class="result-box" id="deleteEntryResult"></div>
+      </div>
     </div>
-  </header>
 
-  <main class="container">
-    <!-- Settings -->
-    <section class="card settings">
-      <div class="card-head">
-        <h2>API Settings</h2>
-        <span class="pill">Base URL + Health Check</span>
+    <!-- FOOD ITEMS PAGE -->
+    <div class="page" id="page-foods">
+      <div class="page-title">Food Items</div>
+      <div class="page-subtitle">Add the specific foods in each meal</div>
+
+      <!-- View All Food Items -->
+      <div class="card">
+        <div class="card-title">All Food Items</div>
+        <div class="btn-row">
+          <button class="btn-primary" onclick="loadAllFoods()">Show All Food Items</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ID</th><th>Entry</th><th>Name</th><th>Serving</th><th>Cal/Serving</th><th>Servings</th><th>P</th><th>C</th><th>F</th></tr></thead>
+            <tbody id="foodsTableBody"><tr><td colspan="9" class="empty-msg">Click "Show All Food Items" to view records</td></tr></tbody>
+          </table>
+        </div>
       </div>
 
-      <div class="grid2">
-        <div class="field">
-          <label for="baseUrl">Base URL</label>
-          <div class="input-row">
-            <input id="baseUrl" value="http://localhost:8080" />
-            <button id="saveBaseUrl" class="btn">Save</button>
+      <!-- Get by Entry -->
+      <div class="card">
+        <div class="card-title">Food Items in a Meal</div>
+        <div class="form-grid">
+          <div class="field">
+            <label>Entry ID</label>
+            <input type="number" id="getFoodEntryId" placeholder="e.g. 1" />
           </div>
         </div>
-
-      <div class="statusbar">
-        <div class="dot" id="dot"></div>
-        <div id="status">Ready.</div>
-      </div>
-    </section>
-
-    <!-- Tabs -->
-    <section class="card">
-      <div class="tabs">
-        <button class="tab active" data-tab="users">Users</button>
-        <button class="tab" data-tab="entries">Entries</button>
-        <button class="tab" data-tab="foods">Food Items</button>
+        <div class="btn-row">
+          <button class="btn-secondary" onclick="getFoodsByEntry()">Find Food Items</button>
+        </div>
+        <div class="result-box" id="getFoodsByEntryResult"></div>
       </div>
 
-      <!-- USERS -->
-      <section class="panel active" id="panel-users">
-        <div class="panel-head">
-          <div>
-            <h3>Users <span class="muted">(app_user)</span></h3>
-            <p class="muted small">GET all • GET single</p>
+      <!-- Create Food Item -->
+      <div class="card">
+        <div class="card-title">Add a Food Item</div>
+        <div class="form-grid cols-3">
+          <div class="field">
+            <label>Entry ID</label>
+            <input type="number" id="createFoodEntryId" placeholder="e.g. 1" />
           </div>
-          <div class="chip">/users</div>
-        </div>
-
-        <div class="controls">
-          <button id="usersAll" class="btn primary">GET /users (all)</button>
-
-          <div class="inline">
-            <input id="userId" type="number" placeholder="user_id" />
-            <button id="usersOne" class="btn">GET /users/{id}</button>
+          <div class="field">
+            <label>Food Name</label>
+            <input type="text" id="createFoodName" placeholder="e.g. Grilled Chicken" />
           </div>
-        </div>
-
-        <div class="table-wrap">
-          <table class="table" id="usersTable">
-            <thead>
-              <tr>
-                <th>User ID</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Created</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-          <pre id="usersRaw" class="raw"></pre>
-        </div>
-      </section>
-
-      <!-- ENTRIES -->
-      <section class="panel" id="panel-entries">
-        <div class="panel-head">
-          <div>
-            <h3>Entries <span class="muted">(calorie_entry)</span></h3>
-            <p class="muted small">GET all • GET single • GET subset by user</p>
+          <div class="field">
+            <label>Description</label>
+            <input type="text" id="createFoodDesc" placeholder="e.g. Boneless, skinless" />
           </div>
-          <div class="chip">/entries • /users/{userId}/entries</div>
-        </div>
-
-        <div class="controls">
-          <button id="entriesAll" class="btn primary">GET /entries (all)</button>
-
-          <div class="inline">
-            <input id="entryId" type="number" placeholder="entry_id" />
-            <button id="entriesOne" class="btn">GET /entries/{id}</button>
+          <div class="field">
+            <label>Serving Size</label>
+            <input type="text" id="createFoodServing" placeholder="e.g. 100g" />
           </div>
-
-          <div class="inline">
-            <input id="entryUserId" type="number" placeholder="user_id for subset" />
-            <button id="entriesSubset" class="btn">GET /users/{userId}/entries</button>
+          <div class="field">
+            <label>Cal per Serving</label>
+            <input type="number" step="0.1" id="createFoodCal" placeholder="e.g. 165" />
+          </div>
+          <div class="field">
+            <label>Number of Servings</label>
+            <input type="number" step="0.1" id="createFoodServings" placeholder="e.g. 1.5" />
+          </div>
+          <div class="field">
+            <label>Protein (g)</label>
+            <input type="number" step="0.1" id="createFoodProtein" placeholder="e.g. 31" />
+          </div>
+          <div class="field">
+            <label>Carbs (g)</label>
+            <input type="number" step="0.1" id="createFoodCarbs" placeholder="e.g. 0" />
+          </div>
+          <div class="field">
+            <label>Fats (g)</label>
+            <input type="number" step="0.1" id="createFoodFats" placeholder="e.g. 3.6" />
+          </div>
+          <div class="field">
+            <label>Notes (optional)</label>
+            <input type="text" id="createFoodNotes" placeholder="Any notes..." />
           </div>
         </div>
-
-        <div class="table-wrap">
-          <table class="table" id="entriesTable">
-            <thead>
-              <tr>
-                <th>Entry ID</th>
-                <th>User ID</th>
-                <th>Date</th>
-                <th>Time</th>
-                <th>Meal</th>
-                <th>Calories</th>
-                <th>P</th>
-                <th>C</th>
-                <th>F</th>
-                <th>Notes</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-          <pre id="entriesRaw" class="raw"></pre>
+        <div class="btn-row">
+          <button class="btn-primary" onclick="createFood()">Add Food Item</button>
         </div>
-      </section>
+        <div class="result-box" id="createFoodResult"></div>
+      </div>
 
-      <!-- FOODS -->
-      <section class="panel" id="panel-foods">
-        <div class="panel-head">
-          <div>
-            <h3>Food Items <span class="muted">(food_item)</span></h3>
-            <p class="muted small">GET all • GET single • GET subset by entry</p>
+      <!-- Update Food Item -->
+      <div class="card">
+        <div class="card-title">Edit a Food Item</div>
+        <div class="form-grid cols-3">
+          <div class="field">
+            <label>Food Item ID</label>
+            <input type="number" id="updateFoodId" placeholder="e.g. 1" />
           </div>
-          <div class="chip">/food-items • /food-items/entry/{entryId}</div>
-        </div>
-
-        <div class="controls">
-          <button id="foodsAll" class="btn primary">GET /food-items (all)</button>
-
-          <div class="inline">
-            <input id="foodId" type="number" placeholder="food_id" />
-            <button id="foodsOne" class="btn">GET /food-items/{id}</button>
+          <div class="field">
+            <label>Food Name</label>
+            <input type="text" id="updateFoodName" placeholder="New name" />
           </div>
-
-          <div class="inline">
-            <input id="foodEntryId" type="number" placeholder="entry_id for subset" />
-            <button id="foodsSubset" class="btn">GET /food-items/entry/{entryId}</button>
+          <div class="field">
+            <label>Serving Size</label>
+            <input type="text" id="updateFoodServing" placeholder="e.g. 150g" />
+          </div>
+          <div class="field">
+            <label>Cal per Serving</label>
+            <input type="number" step="0.1" id="updateFoodCal" placeholder="e.g. 200" />
+          </div>
+          <div class="field">
+            <label>Servings</label>
+            <input type="number" step="0.1" id="updateFoodServings" placeholder="e.g. 2" />
+          </div>
+          <div class="field">
+            <label>Protein (g)</label>
+            <input type="number" step="0.1" id="updateFoodProtein" placeholder="e.g. 25" />
+          </div>
+          <div class="field">
+            <label>Carbs (g)</label>
+            <input type="number" step="0.1" id="updateFoodCarbs" placeholder="e.g. 10" />
+          </div>
+          <div class="field">
+            <label>Fats (g)</label>
+            <input type="number" step="0.1" id="updateFoodFats" placeholder="e.g. 5" />
+          </div>
+          <div class="field">
+            <label>Notes</label>
+            <input type="text" id="updateFoodNotes" placeholder="Updated notes..." />
           </div>
         </div>
-
-        <div class="table-wrap">
-          <table class="table" id="foodsTable">
-            <thead>
-              <tr>
-                <th>Food ID</th>
-                <th>Entry ID</th>
-                <th>Name</th>
-                <th>Serving</th>
-                <th>Cal/Srv</th>
-                <th>P</th>
-                <th>C</th>
-                <th>F</th>
-                <th>Servings</th>
-                <th>Notes</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-          <pre id="foodsRaw" class="raw"></pre>
+        <div class="btn-row">
+          <button class="btn-secondary" onclick="updateFood()">Update Food Item</button>
         </div>
-      </section>
-    </section>
+        <div class="result-box" id="updateFoodResult"></div>
+      </div>
 
-    
-  </main>
+      <!-- Delete Food Item -->
+      <div class="card">
+        <div class="card-title">Remove a Food Item</div>
+        <div class="form-grid">
+          <div class="field">
+            <label>Food Item ID</label>
+            <input type="number" id="deleteFoodId" placeholder="e.g. 1" />
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn-danger" onclick="deleteFood()">Delete Food Item</button>
+        </div>
+        <div class="result-box" id="deleteFoodResult"></div>
+      </div>
+    </div>
 
-  <script src="app.js"></script>
+    <!-- SETTINGS PAGE -->
+    <div class="page" id="page-settings">
+      <div class="page-title">Settings</div>
+      <div class="page-subtitle">Change where the app connects to</div>
+      <div class="card">
+        <div class="card-title">⚙️ API Connection</div>
+        <div class="form-grid">
+          <div class="field">
+            <label>Server Address</label>
+            <input type="text" id="baseUrlInput" value="http://localhost:8080" />
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn-primary" onclick="saveBaseUrl()">Save URL</button>
+          <button class="btn-secondary" onclick="pingServer()">Check Connection</button>
+        </div>
+        <div class="result-box" id="settingsResult"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  function base() {
+    return localStorage.getItem('baseUrl') || 'http://localhost:8080';
+  }
+
+  function setStatus(msg, type = 'ok') {
+    document.getElementById('statusText').textContent = msg;
+    const dot = document.getElementById('dot');
+    dot.className = 'dot ' + type;
+  }
+
+  function formatResult(msg) {
+    if (typeof msg === 'string') return msg;
+    if (Array.isArray(msg)) return `Found ${msg.length} record(s).`;
+    if (typeof msg === 'object' && msg !== null) {
+      // Format object fields nicely
+      const lines = [];
+      for (const [k, v] of Object.entries(msg)) {
+        if (v === null || v === undefined) continue;
+        const label = k.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase());
+        lines.push(`${label}: ${v}`);
+      }
+      return lines.join('\n');
+    }
+    return String(msg);
+  }
+
+  function showResult(id, msg, type = 'success') {
+    const el = document.getElementById(id);
+    el.textContent = formatResult(msg);
+    el.className = 'result-box visible ' + type;
+  }
+
+  function showPage(name, btn) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+    document.getElementById('page-' + name).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  async function apiFetch(url, options = {}) {
+    const headers = { 'Accept': 'application/json' };
+    if (options.body) headers['Content-Type'] = 'application/json';
+    const res = await fetch(base() + url, {
+      ...options,
+      headers: { ...headers, ...(options.headers || {}) }
+    });
+    const text = await res.text();
+    let data;
+    try { data = JSON.parse(text); } catch { data = text; }
+    if (!res.ok) {
+      const msg = typeof data === 'object' ? (data.message || data.error || 'Something went wrong. Please check your inputs and try again.') : data;
+      throw new Error(msg);
+    }
+    return data;
+  }
+
+  function val(id) { return document.getElementById(id).value.trim(); }
+  function num(id) { const v = val(id); return v === '' ? null : Number(v); }
+
+  // ── USERS ──
+  async function loadAllUsers() {
+    try {
+      setStatus('Loading users…');
+      const data = await apiFetch('/users');
+      const tbody = document.getElementById('usersTableBody');
+      if (!data.length) { tbody.innerHTML = '<tr><td colspan="4" class="empty-msg">No users found</td></tr>'; return; }
+      tbody.innerHTML = data.map(u =>
+        `<tr><td>${u.userId}</td><td>${u.name}</td><td>${u.email}</td><td>${(u.createdAt||'').toString().slice(0,10)}</td></tr>`
+      ).join('');
+      setStatus(`Loaded ${data.length} users`, 'ok');
+    } catch(e) { setStatus('Failed to load users', 'err'); }
+  }
+
+  async function getUserById() {
+    const id = num('getUserId');
+    if (!id) return showResult('getUserResult', 'Please enter a User ID', 'error');
+    try {
+      const data = await apiFetch(`/users/${id}`);
+      showResult('getUserResult', data, 'success');
+      setStatus('User found', 'ok');
+    } catch(e) { showResult('getUserResult', e.message, 'error'); setStatus('User not found', 'err'); }
+  }
+
+  async function createUser() {
+    const name = val('createUserName'), email = val('createUserEmail');
+    if (!name || !email) return showResult('createUserResult', 'Name and email are required', 'error');
+    try {
+      const data = await apiFetch('/users', { method: 'POST', body: JSON.stringify({ name: name, email: email }) });
+      showResult('createUserResult', ' User created! ', 'success');
+      setStatus('User created', 'ok');
+      loadAllUsers();
+    } catch(e) { showResult('createUserResult', e.message, 'error'); setStatus('Create failed', 'err'); }
+  }
+
+  async function updateUser() {
+    const id = num('updateUserId'), name = val('updateUserName'), email = val('updateUserEmail');
+    if (!id) return showResult('updateUserResult', 'Please enter a User ID', 'error');
+    try {
+      const res = await fetch(base() + '/users/' + id, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name, email: email })
+      });
+      const text = await res.text();
+      if (!res.ok) throw new Error(text || res.statusText);
+      showResult('updateUserResult', 'User updated successfully!', 'success');
+      setStatus('User updated', 'ok');
+      loadAllUsers();
+    } catch(e) { showResult('updateUserResult', ' ' + e.message, 'error'); setStatus('Update failed', 'err'); }
+  }
+
+  async function deleteUser() {
+    const id = num('deleteUserId');
+    if (!id) return showResult('deleteUserResult', 'Please enter a User ID', 'error');
+    if (!confirm('Delete user #' + id + '? This cannot be undone.')) return;
+    try {
+      const res = await fetch(base() + '/users/' + id, { method: 'DELETE' });
+      const text = await res.text();
+      if (!res.ok) throw new Error(text || res.statusText);
+      showResult('deleteUserResult', 'User deleted successfully!', 'success');
+      setStatus('User deleted', 'ok');
+      loadAllUsers();
+    } catch(e) { showResult('deleteUserResult', ' ' + e.message, 'error'); setStatus('Delete failed', 'err'); }
+  }
+
+  // ── ENTRIES ──
+  async function loadAllEntries() {
+    try {
+      setStatus('Loading entries…');
+      const data = await apiFetch('/entries');
+      const tbody = document.getElementById('entriesTableBody');
+      if (!data.length) { tbody.innerHTML = '<tr><td colspan="9" class="empty-msg">No entries found</td></tr>'; return; }
+      tbody.innerHTML = data.map(e =>
+        `<tr><td>${e.entryId}</td><td>${e.userId}</td><td>${e.entryDate||''}</td><td>${(e.entryTime||'').toString().slice(0,8)}</td><td>${e.mealType||''}</td><td>${e.totalCalories}</td><td>${e.totalProtein}</td><td>${e.totalCarbs}</td><td>${e.totalFats}</td></tr>`
+      ).join('');
+      setStatus(`Loaded ${data.length} entries`, 'ok');
+    } catch(e) { setStatus('Failed to load entries', 'err'); }
+  }
+
+  async function getEntriesByUser() {
+    const id = num('getEntriesUserId');
+    if (!id) return showResult('getEntriesByUserResult', 'Please enter a User ID', 'error');
+    try {
+      const data = await apiFetch(`/users/${id}/entries`);
+      showResult('getEntriesByUserResult', `Found ${data.length} entr${data.length===1?'y':'ies'} for this user.`, 'success');
+      setStatus(`Found ${data.length} entries`, 'ok');
+    } catch(e) { showResult('getEntriesByUserResult', e.message, 'error'); }
+  }
+
+  async function createEntry() {
+    const body = {
+      userId: num('createEntryUserId'),
+      entryDate: val('createEntryDate'),
+      entryTime: val('createEntryTime') + ':00',
+      mealType: val('createEntryMeal'),
+      totalCalories: num('createEntryCalories') || 0,
+      totalProtein: num('createEntryProtein') || 0,
+      totalCarbs: num('createEntryCarbs') || 0,
+      totalFats: num('createEntryFats') || 0,
+      notes: val('createEntryNotes') || null
+    };
+    if (!body.userId || !body.entryDate || !body.mealType) return showResult('createEntryResult', 'User ID, Date, and Meal Type are required', 'error');
+    try {
+      const res = await fetch(base() + '/entries', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+      const data = await res.json();
+      if (!res.ok) throw new Error(res.statusText);
+      showResult('createEntryResult', 'Meal entry logged successfully!', 'success');
+      setStatus('Entry created', 'ok');
+      loadAllEntries();
+    } catch(e) { showResult('createEntryResult', e.message, 'error'); setStatus('Create failed', 'err'); }
+  }
+
+  async function updateEntry() {
+    const id = num('updateEntryId');
+    if (!id) return showResult('updateEntryResult', 'Please enter an Entry ID', 'error');
+    const body = {
+      userId: num('updateEntryUserId'),
+      entryDate: val('updateEntryDate') || undefined,
+      entryTime: val('updateEntryTime') ? val('updateEntryTime') + ':00' : undefined,
+      mealType: val('updateEntryMeal') || undefined,
+      totalCalories: num('updateEntryCalories'),
+      totalProtein: num('updateEntryProtein'),
+      totalCarbs: num('updateEntryCarbs'),
+      totalFats: num('updateEntryFats'),
+      notes: val('updateEntryNotes') || null
+    };
+    try {
+      const res = await fetch(base() + '/entries/' + id, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+      const text = await res.text();
+      if (!res.ok) throw new Error(text || res.statusText);
+      showResult('updateEntryResult', 'Entry updated successfully!', 'success');
+      setStatus('Entry updated', 'ok');
+      loadAllEntries();
+    } catch(e) { showResult('updateEntryResult', e.message, 'error'); setStatus('Update failed', 'err'); }
+  }
+
+  async function deleteEntry() {
+    const id = num('deleteEntryId');
+    if (!id) return showResult('deleteEntryResult', 'Please enter an Entry ID', 'error');
+    if (!confirm(`Delete entry #${id}?`)) return;
+    try {
+      const res = await fetch(base() + '/entries/' + id, { method: 'DELETE' });
+      const text = await res.text();
+      if (!res.ok) throw new Error(text || res.statusText);
+      showResult('deleteEntryResult', 'Entry deleted successfully!', 'success');
+      setStatus('Entry deleted', 'ok');
+      loadAllEntries();
+    } catch(e) { showResult('deleteEntryResult', e.message, 'error'); setStatus('Delete failed', 'err'); }
+  }
+
+  // ── FOOD ITEMS ──
+  async function loadAllFoods() {
+    try {
+      setStatus('Loading food items…');
+      const data = await apiFetch('/food-items');
+      const tbody = document.getElementById('foodsTableBody');
+      if (!data.length) { tbody.innerHTML = '<tr><td colspan="9" class="empty-msg">No food items found</td></tr>'; return; }
+      tbody.innerHTML = data.map(f =>
+        `<tr><td>${f.foodId}</td><td>${f.entryId}</td><td>${f.name}</td><td>${f.servingSize}</td><td>${f.caloriesPerServing}</td><td>${f.servings}</td><td>${f.protein}</td><td>${f.carbs}</td><td>${f.fats}</td></tr>`
+      ).join('');
+      setStatus(`Loaded ${data.length} food items`, 'ok');
+    } catch(e) { setStatus('Failed to load food items', 'err'); }
+  }
+
+  async function getFoodsByEntry() {
+    const id = num('getFoodEntryId');
+    if (!id) return showResult('getFoodsByEntryResult', 'Please enter an Entry ID', 'error');
+    try {
+      const data = await apiFetch(`/food-items/entry/${id}`);
+      showResult('getFoodsByEntryResult', `Found ${data.length} food item${data.length===1?'':'s'} in this meal.`, 'success');
+      setStatus(`Found ${data.length} items`, 'ok');
+    } catch(e) { showResult('getFoodsByEntryResult', e.message, 'error'); }
+  }
+
+  async function createFood() {
+    const body = {
+      entryId: num('createFoodEntryId'),
+      name: val('createFoodName'),
+      description: val('createFoodDesc') || null,
+      servingSize: val('createFoodServing'),
+      caloriesPerServing: num('createFoodCal') || 0,
+      servings: num('createFoodServings') || 1,
+      protein: num('createFoodProtein') || 0,
+      carbs: num('createFoodCarbs') || 0,
+      fats: num('createFoodFats') || 0,
+      notes: val('createFoodNotes') || null
+    };
+    if (!body.entryId || !body.name || !body.servingSize) return showResult('createFoodResult', 'Entry ID, Name, and Serving Size are required', 'error');
+    try {
+      const res = await fetch(base() + '/food-items', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+      const data = await res.json();
+      if (!res.ok) throw new Error(res.statusText);
+      showResult('createFoodResult', 'Food item added successfully!', 'success');
+      setStatus('Food item created', 'ok');
+      loadAllFoods();
+    } catch(e) { showResult('createFoodResult', e.message, 'error'); setStatus('Create failed', 'err'); }
+  }
+
+  async function updateFood() {
+    const id = num('updateFoodId');
+    if (!id) return showResult('updateFoodResult', 'Please enter a Food Item ID', 'error');
+    const body = {
+      name: val('updateFoodName') || undefined,
+      servingSize: val('updateFoodServing') || undefined,
+      caloriesPerServing: num('updateFoodCal'),
+      servings: num('updateFoodServings'),
+      protein: num('updateFoodProtein'),
+      carbs: num('updateFoodCarbs'),
+      fats: num('updateFoodFats'),
+      notes: val('updateFoodNotes') || null
+    };
+    try {
+      const res = await fetch(base() + '/food-items/' + id, { method: 'PUT', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+      if (!res.ok) throw new Error(res.statusText);
+      showResult('updateFoodResult', 'Food item updated successfully!', 'success');
+      setStatus('Food item updated', 'ok');
+      loadAllFoods();
+    } catch(e) { showResult('updateFoodResult', e.message, 'error'); setStatus('Update failed', 'err'); }
+  }
+
+  async function deleteFood() {
+    const id = num('deleteFoodId');
+    if (!id) return showResult('deleteFoodResult', 'Please enter a Food Item ID', 'error');
+    if (!confirm(`Delete food item #${id}?`)) return;
+    try {
+      const res = await fetch(base() + '/food-items/' + id, { method: 'DELETE' });
+      if (!res.ok) throw new Error(res.statusText);
+      showResult('deleteFoodResult', 'Food item deleted successfully!', 'success');
+      setStatus('Food item deleted', 'ok');
+      loadAllFoods();
+    } catch(e) { showResult('deleteFoodResult', e.message, 'error'); setStatus('Delete failed', 'err'); }
+  }
+
+  // ── SETTINGS ──
+  function saveBaseUrl() {
+    const url = val('baseUrlInput');
+    localStorage.setItem('baseUrl', url);
+    showResult('settingsResult', 'Base URL saved: ' + url, 'success');
+  }
+
+  async function pingServer() {
+    try {
+      const data = await apiFetch('/users/ping');
+      showResult('settingsResult', 'Connected! Server responded: ' + data, 'success');
+      setStatus('Connected', 'ok');
+    } catch(e) {
+      showResult('settingsResult', 'Cannot reach server. Is the backend running at ' + base() + '?', 'error');
+      setStatus('Connection failed', 'err');
+    }
+  }
+
+  // Load base URL from storage on startup
+  window.addEventListener('DOMContentLoaded', () => {
+    const saved = localStorage.getItem('baseUrl');
+    if (saved) document.getElementById('baseUrlInput').value = saved;
+  });
+</script>
+
 </body>
 </html>

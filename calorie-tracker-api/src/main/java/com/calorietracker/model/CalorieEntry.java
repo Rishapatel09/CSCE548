@@ -5,8 +5,8 @@ import java.sql.Time;
 import java.sql.Timestamp;
 
 public class CalorieEntry {
-    private int entryId;
-    private int userId;
+    private Integer entryId;
+    private Integer userId;
     private Date entryDate;
     private Time entryTime;
     private String mealType;
@@ -16,11 +16,11 @@ public class CalorieEntry {
 
     public CalorieEntry() {}
 
-    public int getEntryId() { return entryId; }
-    public void setEntryId(int entryId) { this.entryId = entryId; }
+    public Integer getEntryId() { return entryId; }
+    public void setEntryId(Integer entryId) { this.entryId = entryId; }
 
-    public int getUserId() { return userId; }
-    public void setUserId(int userId) { this.userId = userId; }
+    public Integer getUserId() { return userId; }
+    public void setUserId(Integer userId) { this.userId = userId; }
 
     public Date getEntryDate() { return entryDate; }
     public void setEntryDate(Date entryDate) { this.entryDate = entryDate; }

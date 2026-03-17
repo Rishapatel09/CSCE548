@@ -2,8 +2,8 @@ package com.calorietracker.model;
 
 import java.sql.Timestamp;
 public class FoodItem {
-    private int foodId;
-    private int entryId;
+    private Integer foodId;
+    private Integer entryId;
     private String name;
     private String description;
     private String servingSize;
@@ -13,8 +13,8 @@ public class FoodItem {
 
     public FoodItem() {}
 
-    public int getFoodId() { return foodId; }
-    public void setFoodId(int foodId) { this.foodId = foodId; }
+    public Integer getFoodId() { return foodId; }
+    public void setFoodId(Integer foodId) { this.foodId = foodId; }
 
     public int getEntryId() { return entryId; }
     public void setEntryId(int entryId) { this.entryId = entryId; }

@@ -1,24 +1,26 @@
 package com.calorietracker.model;
 
 import java.sql.Timestamp;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class AppUser {
-    private int userId;
+    private Integer userId;
     private String name;
     private String email;
     private Timestamp createdAt;
 
     public AppUser() {}
 
-    public AppUser(int userId, String name, String email, Timestamp createdAt) {
+    public AppUser(Integer userId, String name, String email, Timestamp createdAt) {
         this.userId = userId;
         this.name = name;
         this.email = email;
         this.createdAt = createdAt;
     }
 
-    public int getUserId() { return userId; }
-    public void setUserId(int userId) { this.userId = userId; }
+    public Integer getUserId() { return userId; }
+    public void setUserId(Integer userId) { this.userId = userId; }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
